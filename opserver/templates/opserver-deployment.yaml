@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: opserver
+  name: opserver
+  namespace: quality-assurance
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opserver
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
+      labels:
+        app: opserver
+    spec:
+      {{- if .Values.imageCredentials }}
+      imagePullSecrets:
+        - name: registry
+      {{- end }}
+      containers:
+        - args:
+            - sh
+            - -c
+            - python main.py
+          env:
+            - name: CLUSTER_URL
+              value: {{ .Values.clusterURL }}
+            - name: API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opserver-secret
+                  key: API_TOKEN
+          image: {{ .Values.image }}
+          imagePullPolicy: Always
+          name: opserver
+          ports:
+            - name: http
+              containerPort: 8080
+              hostPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: opserver-config
+              readOnly: true
+          resources: {}
+      restartPolicy: Always
+      volumes:
+        - name: opserver-config
+          configMap:
+            name: opserver-configmap

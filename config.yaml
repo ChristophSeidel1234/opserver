@@ -1,0 +1,8 @@
+apiToken: "secret-token"
+baseIngress: "ingress.com"
+clusterURL: "https://rancher-url/v3"
+clusters:
+  prod-cluster: "ingress.com"
+debug: False
+proxy: False
+verify: False

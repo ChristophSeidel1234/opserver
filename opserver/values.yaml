@@ -1,0 +1,15 @@
+apiToken: "secret-token"
+clusterURL: "https://rancher-url/v3"
+image: "qs-automator:test"
+baseIngress: "ingress.com"
+imageCredentials:
+  registry: docker.io
+  username: myname
+  password: mapassword
+
+istioIngressgateway:
+  cpu: 2
+  memory: 1Gi
+rancherMonitoringPrometheus:
+  cpu: 1
+  memory: 3000Mi

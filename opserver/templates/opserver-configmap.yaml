@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  #clusters.yaml: |
+  #  - {{ .Values.clustername }}
+  limits.yaml: |
+    istio-ingressgateway:
+      cpu:  {{ .Values.istioIngressgateway.cpu }}
+      memory: {{ .Values.istioIngressgateway.memory }}
+    rancher-monitoring-prometheus:
+      cpu:  {{ .Values.rancherMonitoringPrometheus.cpu }}
+      memory: {{ .Values.rancherMonitoringPrometheus.memory }}
+kind: ConfigMap
+metadata:
+  name: opserver-configmap
+  namespace: quality-assurance  
+  labels:
+    app: opserver

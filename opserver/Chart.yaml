@@ -1,0 +1,9 @@
+apiVersion: v2
+name: infologistix-opserver
+description: OPServer is a continuous automated quality assurance system.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+maintainers:
+  - name: kubespectra
+    url: https://kubespectra.com/

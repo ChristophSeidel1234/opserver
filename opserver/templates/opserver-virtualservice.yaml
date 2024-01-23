@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  labels:
+    app: opserver
+  name: opserver
+  namespace: quality-assurance
+spec:
+  gateways:
+    - istio-system/istio-ingress-gateway
+  hosts:
+    - opserver.{{ .Values.baseIngress }}
+  http:
+    - match:
+        - uri:
+            prefix: /
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: opserver.quality-assurance.svc.cluster.local
+            port:
+              number: 8080
