@@ -1,10 +1,10 @@
 # OPServer by infologistix
-## Description
+
 OPServer is a continuous automated quality assurance system and as cloud-native solution designed to verify the functionality of multi-cluster Kubernetes platforms. In addition to the usual observability, it enables the examination of various functionalities. For instance, it can validate external calls and calls to external targets.
 
 
-#### Note
-We are in the beta phase of developing.
+### Note
+We are currently in the beta phase and it is not yet possible to contribute. However, this should be possible in the future. If you would still like to share an idea with us, please send an e-mail to cloudengineering@infologistix.de.
 
 
 ## Metrics
