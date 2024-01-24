@@ -3,6 +3,10 @@
 OPServer is a continuous automated quality assurance system and as cloud-native solution designed to verify the functionality of multi-cluster Kubernetes platforms. In addition to the usual observability, it enables the examination of various functionalities. For instance, it can validate external calls and calls to external targets.
 
 
+#### Note
+We are in the beta phase of developing.
+
+
 ## Metrics
 The container exports the metrics to `/metrics`
 
@@ -47,3 +51,19 @@ $ helm install opserver ./opserver --namespace quality-assurance --create-namesp
 ```bash
 $ helm uninstall opserver --namespace quality-assurance
 ```
+
+# License
+
+Copyright (c) infologistix GmbH
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
