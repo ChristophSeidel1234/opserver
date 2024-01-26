@@ -16,8 +16,7 @@ RUN apk add \
 RUN pip install --no-cache-dir codetiming secure
 
 COPY src .
-COPY ../config.yaml config/config.yaml
+COPY config /config
 EXPOSE 8080
 
-#ENTRYPOINT ["python3", "/usr/src/app/main.py"]
-CMD ["sleep", "infinity"]
+ENTRYPOINT ["python3", "/usr/src/app/main.py"]
