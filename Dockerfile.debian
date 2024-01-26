@@ -1,4 +1,5 @@
-FROM python
+ARG ARCH
+FROM ${ARCH}python:slim
 
 WORKDIR /usr/src/app
 

@@ -1,0 +1,23 @@
+ARG ARCH
+FROM ${ARCH}python:alpine
+
+WORKDIR /usr/src/app
+
+#RUN pip install --no-cache-dir packaging requests codetiming boto3 flask pyyaml secure prometheus_client
+
+RUN apk add \
+  py3-boto3 \
+  py3-packaging \
+  py3-requests \
+  py3-flask \
+  py3-pyaml \
+  py3-prometheus-client
+
+RUN pip install --no-cache-dir codetiming secure
+
+COPY src .
+COPY ../config.yaml config/config.yaml
+EXPOSE 8080
+
+#ENTRYPOINT ["python3", "/usr/src/app/main.py"]
+CMD ["sleep", "infinity"]
