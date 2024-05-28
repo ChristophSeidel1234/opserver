@@ -16,6 +16,10 @@ The values in `config.yaml` must be adjusted for the configuration.
 
 ### Values
 
+#### Config
+
+The `config.yaml` speficies the configuration of the opserver plugin.
+
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `clusterURL` | string | mandatory | Rancher URL |
@@ -26,6 +30,11 @@ The values in `config.yaml` must be adjusted for the configuration.
 | `verify` | string | `True` | verify SSL certificate |
 
 The API-Token can be set as Environment-Variable. This takes presedence over the setting in `config.yaml`.
+
+#### Limits
+
+The `limits.yaml` will specify the corresponding limits for the management scraping while searching for the required performance values.
+To adapt to new changes, simply edit the defaults in `config/limits.yaml` or supply during runtime.
 
 ## Usage
 

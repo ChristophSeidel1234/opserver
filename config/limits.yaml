@@ -1,0 +1,15 @@
+istio-ingressgateway:
+  cpu: "6"
+  memory: "24Gi"
+
+kube-prometheus-stack-prometheus:
+  cpu: "2"
+  memory: "50000Mi"
+
+prometheus:
+  cpu: "2"
+  memory: "50000Mi"
+
+rancher-monitoring-prometheus:
+  cpu: "2"
+  memory: "50000Mi"
