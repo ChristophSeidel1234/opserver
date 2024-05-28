@@ -1,0 +1,8 @@
+packaging
+requests
+codetiming
+boto3
+flask
+pyyaml
+secure
+prometheus_client
