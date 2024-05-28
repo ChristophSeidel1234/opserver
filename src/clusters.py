@@ -3,18 +3,8 @@
 from typing import List
 from requests import get
 from dataclasses import dataclass
-#from pprint import pprint
-#import yaml
-#import re
-#import os
+import os
 
-#def clusters(path: str):
-#    if os.path.exists(path):
-#        with open(path, "r") as f:
-#            clusters = yaml.safe_load(f)
-#    else:
-#        clusters = []
-#    return clusters
 
 @dataclass
 class Cluster():
@@ -22,21 +12,31 @@ class Cluster():
     id: str # Rancher ClusterID
     state: str # State
     n_nodes: int # number of Nodes
-    #location: str # Standort Label zB
-    #environment: str # Prod, Dev, Test, ...
-    base: str="" # Ingress Base Domain für Dinge auf dem Cluster
+    environment: List[str] # Description of the cluster location. Can be used afterwards...
+    base: str # Ingress Base Domain für Dinge auf dem Cluster
 
-    #def destruct_cluster(self, cluster):
-    #    r=r'i-(?P<location>\w{3})-(?P<cluster>.*)'
-    #    #return re.search(r, cluster).groups()
-    #    return "name"
+@dataclass
+class ClusterConfigCluster():
+    name: str
+    ingress: str
+    environment: List[str] = [""]
 
-    #def __post_init__(self):
-        # name = self.name.split("-")[-1]
-    #    print('name:', self.name)
-    #    name = self.name #self.destruct_cluster(self.name)[-1] or "prod-cluster" or "mycluster" # To Generalize
-    #    name = name if name != "plattform" else "services"
-    #    self.base = f"https://{name}-bapc-{self.location}.con.{self.environment}" # To Change or in config.yaml?
+@dataclass
+class ClusterConfig():
+    clusterURL: str
+    clusters: List[ClusterConfigCluster]
+    apiToken: str = ""
+    debug: bool = False
+    proxy: bool = True
+    verify: bool = True
+
+    def __post_init__(self):
+        # check if env-api-token is set
+        if os.getenv("API_TOKEN"):
+            self.apiToken = os.getenv("API_TOKEN")
+        # if not set here or as env -> Throw error
+        if self.apiToken == "":
+            raise ValueError("No API_TOKEN is set! Please use environment or config.yaml")
 
 @dataclass
 class ClusterType():
@@ -68,15 +68,12 @@ class K8sCluster():
         Accept Legacy Cluster "Vermittlung"
     '''
 
-    def __init__(self, url: str, token: str, clusters: list, debug_=False, verify=False, clusterType: ClusterType=ClusterType(name="rancher")) -> None: # path: str="/config/clusters.yaml"
-        self.__url=url
-        self.__token=token
-        self.__qs = clusters
-        self.__debug = debug_
-        self.__verify = verify 
-        #self.__base = ""
-        #self.__environment = environment #"idst.ibaintern.de" if "idst" in url else "dst.baintern.de" # To Change
-        #self.__location = location #"vdt" if "vdt" in url else "thf" # To Change
+    def __init__(self, config: ClusterConfig, clusterType: ClusterType=ClusterType(name="rancher")) -> None: # path: str="/config/clusters.yaml"
+        self.__config = config
+        self.__clusters = [c["name"] for c in config.clusters]
+
+    def __get_cluster(self, clusterName:str) -> dict :
+        return next(item for item in self.__config.clusters if item["name"] == clusterName)
 
     def loadClusters(self) -> List[Cluster]:
         '''Loads the ClusterIDs and additional Cluster Information 
@@ -90,29 +87,28 @@ class K8sCluster():
         Cluster Endpoint Exception...
         '''
         try:
-            response = get(f"{self.__url}/clusters", headers={"Authorization": f"Bearer {self.__token}"}, timeout=2, verify=self.__verify) #self.__debug
-            print("---init---\n self.__url:",self.__url,"\n self.__token:", self.__token, "\nself.__qs:",self.__qs, "\n self.__debug:",self.__debug )
-            if self.__debug:
+            response = get(f"{self.__config.clusterURL}/clusters", headers={"Authorization": f"Bearer {self.__config.apiToken}"}, timeout=2, verify=self.__config.verify) #self.__debug
+            print("---init---\n self.__url:",self.__config.clusterURL,"\n self.__token:", self.__config.apiToken, "\nself.__qs:",self.__clusters, "\n self.__debug:",self.__config.debug )
+            if self.__config.debug:
                 print(response)
             if response.status_code == 200:
                 clusters = response.json().get("data")
                 qsClusters = []
                 for c in clusters:
                     name = c["name"]
-                    if any([s == name for s in self.__qs]):
+                    if any([s == name for s in self.__clusters]):
                         cluster_id = c["id"]
-                        response_nodes = get(f"{self.__url}/clusters/{cluster_id}/nodes", headers={"Authorization": f"Bearer {self.__token}"}, timeout=2, verify=self.__verify) #self.__debug
+                        # get current nodes....
+                        response_nodes = get(f"{self.__config.clusterURL}/clusters/{cluster_id}/nodes", headers={"Authorization": f"Bearer {self.__config.apiToken}"}, timeout=2, verify=self.__config.verify) #self.__debug
                         n_nodes = len(response_nodes.json().get("data"))
                         c_ = Cluster(name=c["name"], 
                                      id= cluster_id, 
                                      state= c["state"],
-                                     # to be implemeted...
-                                     # specific AKS config
-                                     #n_nodes= sum([item["count"] for item in c["appliedSpec"]["aksConfig"]["nodePools"]]),
                                      n_nodes= n_nodes,
-                                     base = self.__qs[name])
+                                     environment=self.__get_cluster(name)["environment"],
+                                     base = self.__get_cluster(name)["ingress"])
                         qsClusters.append(c_)
                 print('qsClusters:', qsClusters)
                 return qsClusters
         except:
-            raise Exception(f"Cluster Endpoint {self.__url} not available...")
+            raise Exception(f"Cluster Endpoint {self.__config.clusterURL} not available...")

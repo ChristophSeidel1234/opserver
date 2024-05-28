@@ -8,7 +8,7 @@ from typing import List
 from dataclasses import asdict
 from requests import get
 from requests.exceptions import ConnectTimeout
-from clusters import K8sCluster, Cluster
+from clusters import K8sCluster, Cluster, ClusterConfig
 from manager import Manager, ResourceLimits
 from faillog import QSLog
 from monitoring import Monitor
@@ -36,14 +36,14 @@ if os.getenv("APPLICATION_ROOT"):
     app.config['APPLICATION_ROOT'] = os.getenv("APPLICATION_ROOT")
 
 class QS():
-    def __init__(self, clusters: List[Cluster], token: str, url: str, limits: ResourceLimits, proxy:bool=False, debug_:bool=False, verify:bool=False) -> None:
+    def __init__(self, clusters: List[Cluster], config:ClusterConfig, limits: ResourceLimits) -> None:
         self.__clusters = clusters
-        self.__token = token
-        self.__url = url
+        self.__token = config.apiToken
+        self.__url = config.clusterURL
         self.__limits = limits
-        self.__debug = debug_
-        self.__proxy = proxy
-        self.__verify = verify
+        self.__debug = config.debug
+        self.__proxy = config.proxy
+        self.__verify = config.verify
         self.__log = QSLog()
 
     @Timer(name="Complete Run")
@@ -87,22 +87,22 @@ class QS():
         print("--------\nSTEP 3 - Monitoring\nrunning QS...")
         Monitor(url=self.__url, log=self.__log, debug_=self.__debug, verify=self.__verify).runQS(self.__clusters)
 
-#def argParser() -> Namespace:
-    #parser = ArgumentParser(description="Cluster Exploration und Dashboard Verifikation - QS")
+def argParser() -> Namespace:
+    parser = ArgumentParser(description="Cluster Exploration und Dashboard Verifikation - QS")
     #parser.add_argument("--token", "-t", dest="token", type=str, default=None, help='Token for registration on the cluster')
     #parser.add_argument("--cluster", "-c", dest="cluster", type=str, default=None, help='Rancher Cluster URL')
     #parser.add_argument("--debug", dest="debug", action="store_true", help="set to debugging mode")
     #parser.add_argument("--proxy", dest="proxy", action="store_false", default=True, help="Use Rancher Proxy and scrape that endpoint for testing")
-    #parser.add_argument("--path", type=str, dest="path", default="config/config.yaml", help="Path for Config yaml")
-    #return parser.parse_args()
+    parser.add_argument("--path", type=str, dest="path", default="/config/config.yaml", help="Path for Config yaml")
+    return parser.parse_args()
 
 def readYAML(path: str):
     if os.path.exists(path):
         with open(path, "r") as f:
             conf = yaml.safe_load(f)
+            return ClusterConfig(**conf)
     else:
-        conf = []
-    return conf
+        raise Exception("No Config Loaded")
 
 def buildResponse():
     if not updateLog:
@@ -216,17 +216,15 @@ def apiServer():
     app.run(host="0.0.0.0", port=8080, debug=False)
 
 if __name__=="__main__":
-    #args = argParser()
-    conf = readYAML("config/config.yaml")
-    token = conf['apiToken'] #args.token or os.getenv("API_TOKEN")
-    cluster = conf['clusterURL'] #args.cluster or os.getenv("CLUSTER_URL")  
+    args = argParser()
+    config = readYAML(args.path)
     try:
-        clusters = K8sCluster(url=cluster, token=token, clusters=conf['clusters'], debug_=conf['debug'], verify=conf['verify']).loadClusters()
+        clusters = K8sCluster(config=config).loadClusters()
     except ConnectTimeout:
-        print(f"Connection to {cluster} failed. Host not reachable!")
+        print(f"Connection to {config.clusterURL} failed. Host not reachable!")
         exit()
     #just wait till everything is up & running and start api-server
-    if not conf['debug']:
+    if not config.debug:
         threading.Thread(target=apiServer, daemon=True).start()
     else:
         print(clusters)
@@ -241,14 +239,14 @@ if __name__=="__main__":
             lastTime = time.time()
             print(f"\nStarting new Testcycle @ {time.strftime('%a, %d.%m.%y %H:%M:%S')}\n")
             try:
-                clusters = K8sCluster(url=cluster, token=token, clusters=conf['clusters'], debug_=conf['debug'], verify=conf['verify']).loadClusters()
+                clusters = K8sCluster(config=config).loadClusters()
             except ConnectTimeout:
-                print(f"Connection to {cluster} failed. Host not reachable!")
+                print(f"Connection to {config.clusterURL} failed. Host not reachable!")
                 exit()
 
             print("clusters:", clusters)
-            clusters[0].base = conf['baseIngress']
-            qs = QS(clusters=clusters, token=token, url=cluster, debug_=conf['debug'], proxy=conf['proxy'], verify=conf['verify'], limits=ResourceLimits())
+            #clusters[0].base = conf['baseIngress']
+            qs = QS(clusters=clusters, config=config, limits=ResourceLimits())
             qs.run()
-        if conf['debug']:
+        if config.debug:
             break

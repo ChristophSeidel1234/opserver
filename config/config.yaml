@@ -1,8 +1,12 @@
-apiToken: "secret-token"
-baseIngress: "ingress.com"
+#apiToken: "secret-token"
 clusterURL: "https://rancher-url/v3"
 clusters:
-  prod-cluster: "ingress.com"
+  - name: "prod" 
+    ingress: "ingress.com"
+    environment: ["prod", "gcp"]
+  - name: "dev"
+    ingress: "dev.ingress.com"
+    environment: ["dev", "internal"]
 debug: False
-proxy: False
+proxy: True
 verify: False
