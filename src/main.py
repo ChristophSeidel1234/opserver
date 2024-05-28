@@ -104,17 +104,6 @@ def readYAML(path: str):
         conf = []
     return conf
 
-def checkURL(url:str, token:str):
-    headers = {"Authorization": f"Bearer {token}"}
-    response = get(url, headers=headers, verify=False) # später verify0Flase wieder rausnehmen
-    if response.status_code != 200:
-        if "webapp" in url:
-            # ignore webapp...
-            return url.replace(".webapp", "")
-        else:
-            raise Exception("No Connection possible...")
-    return url
-
 def buildResponse():
     if not updateLog:
         return {
@@ -230,8 +219,7 @@ if __name__=="__main__":
     #args = argParser()
     conf = readYAML("config/config.yaml")
     token = conf['apiToken'] #args.token or os.getenv("API_TOKEN")
-    cluster = conf['clusterURL'] #args.cluster or os.getenv("CLUSTER_URL")
-    cluster = checkURL(cluster, token)   
+    cluster = conf['clusterURL'] #args.cluster or os.getenv("CLUSTER_URL")  
     try:
         clusters = K8sCluster(url=cluster, token=token, clusters=conf['clusters'], debug_=conf['debug'], verify=conf['verify']).loadClusters()
     except ConnectTimeout:
