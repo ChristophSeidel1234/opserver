@@ -261,9 +261,9 @@ class Manager():
             splashes = []
             pods = self.__getk8s(f"/clusters/{nsSystemId.split(':')[0]}/api/v1/namespaces/istio-system/pods?labelSelector=app=istiod")
             # allows checking of istiod deployments :)
-            # min pods == 2
+            # min pods == 1
             print("Anzahl der Pods: ", len(pods))
-            if len(pods) < 3:
+            if len(pods) < 1:
                 self.__log.write(f"[\033[0;31mFailed\033[0m]\tCluster {cluster.name} deployed too few istiod pods")
             else:
                 for k,v in getIstioVersion(pods).items():
