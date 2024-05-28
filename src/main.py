@@ -245,7 +245,6 @@ if __name__=="__main__":
                 exit()
 
             print("clusters:", clusters)
-            #clusters[0].base = conf['baseIngress']
             qs = QS(clusters=clusters, config=config, limits=ResourceLimits())
             qs.run()
         if config.debug:
