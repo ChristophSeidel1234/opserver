@@ -1,23 +1,38 @@
+{{- if .Values.ingress.enabled }}
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   labels:
     app: opserver
   name: opserver
-  namespace: quality-assurance
+  namespace: {{ .Release.Namespace }}
 spec:
+  {{- with .Values.ingress.config }}
   gateways:
-    - istio-system/istio-ingress-gateway
+    {{- range .gateways }}
+    - {{ . | default "istio-system/istio-ingress-gateway" }}
+    {{- end }}
   hosts:
-    - opserver.{{ .Values.baseIngress }}
+    {{- range .hosts }}
+    - {{ . }}
+    {{- end }}
   http:
+    {{- range .paths }}
     - match:
         - uri:
-            prefix: /
+            exact: /{{ trimAll "/" . }}
+      redirect:
+        uri: /{{ trimAll "/" . }}/
+    - match:
+        - uri:
+            prefix: /{{ trimAll "/" .  }}/
       rewrite:
         uri: /
       route:
         - destination:
-            host: opserver.quality-assurance.svc.cluster.local
+            host: {{ include "opserver.fullname" $ }}.{{ $.Release.Namespace }}.svc.cluster.local
             port:
               number: 8080
+    {{- end }}
+  {{- end }}
+{{- end }}

@@ -1,16 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: opserver
-  namespace: quality-assurance
+  name: {{ include "opserver.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: opserver
+    {{- include "opserver.labels" . | nindent 4 }}
 spec:
   selector:
-    app: opserver
-  type: ClusterIP
+    {{- include "opserver.selectorLabels" . | nindent 4 }}
   ports:
     - name: http
-      port: 8080
-      targetPort: 8080
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
       protocol: TCP

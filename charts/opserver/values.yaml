@@ -1,15 +1,56 @@
-apiToken: "secret-token"
-clusterURL: "https://rancher-url/v3"
-image: "qs-automator:test"
-baseIngress: "ingress.com"
-imageCredentials:
-  registry: docker.io
-  username: myname
-  password: mapassword
 
-istioIngressgateway:
-  cpu: 2
-  memory: 1Gi
-rancherMonitoringPrometheus:
-  cpu: 1
-  memory: 3000Mi
+image:
+  ## Image Setttings
+  # registry: "docker.io"
+  repository: "qs-automator"
+  pullPolicy: Always
+  tag: "test"
+
+  imagePullSecrets:
+    - registry: docker.io
+      username: myname
+      password: password
+
+pod:
+  annotations:
+    sidecar.istio.io/rewriteAppHTTPProbers: "true"
+  labels: {}
+
+ingress:
+  enabled: true
+  config: 
+    hosts:
+      - "ingress.com"
+    #gateways: ""
+    paths:
+      - /opserver
+
+config:
+  apiToken: "secret-token"
+  config:
+    clusterURL: "https://rancher-url/v3"
+    clusters:
+      - name: "my-cluster"
+        ingress: "my-cluster.domain.com"
+        environment: ["cluster"]
+  limits:
+    istioIngressgateway:
+      cpu: 2
+      memory: 1Gi
+    rancherMonitoringPrometheus:
+      cpu: 1
+      memory: 3000Mi
+
+service:
+  port: 8080
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""

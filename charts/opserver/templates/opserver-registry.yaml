@@ -1,12 +1,15 @@
-{{- if .Values.imageCredentials }}
+{{- if .Values.image.imagePullSecrets }}
+{{- range $index, $registry := .Values.image.imagePullSecrets}}
 apiVersion: v1
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
 kind: Secret
 metadata:
   labels:
-    app: opserver
-  name: registry
-  namespace: quality-assurance
+    {{- include "opserver.labels" $ | nindent 4 }}
+  name: {{ print "registry-" $index }}
+  namespace: {{ $.Release.Namespace }}
+data:
+  .dockerconfigjson: {{ template "imagePullSecret" $registry }}
 type: kubernetes.io/dockerconfigjson
+---
+{{- end }}
 {{- end }}

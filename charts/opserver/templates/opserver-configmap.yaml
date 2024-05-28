@@ -1,17 +1,12 @@
 apiVersion: v1
 data:
-  #clusters.yaml: |
-  #  - {{ .Values.clustername }}
+  config.yaml: |
+    {{- toYaml .Values.config.config | nindent 4 }}
   limits.yaml: |
-    istio-ingressgateway:
-      cpu:  {{ .Values.istioIngressgateway.cpu }}
-      memory: {{ .Values.istioIngressgateway.memory }}
-    rancher-monitoring-prometheus:
-      cpu:  {{ .Values.rancherMonitoringPrometheus.cpu }}
-      memory: {{ .Values.rancherMonitoringPrometheus.memory }}
+    {{- toYaml .Values.config.limits | nindent 4 }}
 kind: ConfigMap
 metadata:
-  name: opserver-configmap
-  namespace: quality-assurance  
+  name: {{ include "opserver.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: opserver
+    {{- include "opserver.labels" $ | nindent 4 }}

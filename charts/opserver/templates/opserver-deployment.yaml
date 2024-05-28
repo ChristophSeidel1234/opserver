@@ -2,55 +2,65 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: opserver
-  name: opserver
-  namespace: quality-assurance
+    {{- include "opserver.labels" . | nindent 4 }}
+  name: {{ include "opserver.fullname" . }}
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: opserver
+      {{- include "opserver.selectorLabels" . | nindent 6 }}
   strategy:
     type: Recreate
   template:
     metadata:
+      {{- with .Values.pod.annotations }}
       annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: "false"
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
-        app: opserver
+        {{- include "opserver.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
-      {{- if .Values.imageCredentials }}
+      {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:
-        - name: registry
+      {{- range $index, $s := . }}
+        - {{- print "registry-" $index }}
+      {{- end }}
       {{- end }}
       containers:
-        - args:
-            - sh
-            - -c
-            - python main.py
-          env:
-            - name: CLUSTER_URL
-              value: {{ .Values.clusterURL }}
+        - env:
             - name: API_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: opserver-secret
+                  name: {{ template "opserver.fullname" . }}-secret
                   key: API_TOKEN
-          image: {{ .Values.image }}
-          imagePullPolicy: Always
-          name: opserver
+          image: "{{ default "docker.io" .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: {{ .Chart.Name }}
           ports:
             - name: http
-              containerPort: 8080
-              hostPort: 8080
+              containerPort: {{ .Values.service.port }}
+              hostPort: {{ .Values.service.port }}
               protocol: TCP
           volumeMounts:
             - mountPath: /config
-              name: opserver-config
+              name: {{ include "opserver.fullname" . }}-config
               readOnly: true
-          resources: {}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
       restartPolicy: Always
       volumes:
-        - name: opserver-config
+        - name: {{ include "opserver.fullname" . }}-config
           configMap:
-            name: opserver-configmap
+            name: {{ include "opserver.fullname" . }}-config
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
