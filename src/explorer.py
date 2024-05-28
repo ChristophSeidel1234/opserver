@@ -201,6 +201,6 @@ class Dashboard():
                 self.load(cluster, dashboardType="grafana")
                 self.load(cluster, dashboardType="promTargets")
                 self.load(cluster, dashboardType="promGraphs")
-                self.load(cluster, dashboardType="jaeger") # now on every cluster
+                # self.load(cluster, dashboardType="jaeger") # jaeger might not be installed...
             else:
                 print("Cluster {} has failed active state...".format(cluster.name))
