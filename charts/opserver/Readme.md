@@ -41,11 +41,8 @@ The following table lists the configurable parameters of the Opserver chart and 
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| config.apiToken | string | `"secret-token"` | Config.yaml Sample for the Application. |
-| config.config.clusterURL | string | `"https://rancher-url/v3"` |  |
-| config.config.clusters[0].environment[0] | string | `"cluster"` |  |
-| config.config.clusters[0].ingress | string | `"my-cluster.domain.com"` |  |
-| config.config.clusters[0].name | string | `"my-cluster"` |  |
+| config.apiToken | string | `"secret-token"` | the rancher API-Token to be supplied |
+| config.config | object | `{"clusterURL":"https://rancher-url/v3","clusters":[{"environment":["cluster"],"ingress":"my-cluster.domain.com","name":"my-cluster"}]}` | Config.yaml Sample for the Application. |
 | config.limits | object | `{"istioIngressgateway":{"cpu":2,"memory":"1Gi"},"rancherMonitoringPrometheus":{"cpu":1,"memory":"3000Mi"}}` | limit.yaml Sample for the Application set the Limits for the artefacts |
 | image | object | `{"imagePullSecrets":[],"pullPolicy":"Always","registry":"","repository":"qs-automator","tag":"test"}` | Configure custom image specs |
 | image.imagePullSecrets | list | one or more of `[{"name": "registry"}, {"name": "docker", "registry": "docker.io", "username": "user", "password": "password"}]` | Image Pull Secrets. If only Name is registered. If registry, username, password is set, will be generating a new docker secret |

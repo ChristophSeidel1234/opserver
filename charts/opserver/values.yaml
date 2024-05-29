@@ -53,8 +53,9 @@ ingress:
       - /opserver
 
 config:
-  # -- Config.yaml Sample for the Application.
+  # -- the rancher API-Token to be supplied
   apiToken: "secret-token"
+  # -- Config.yaml Sample for the Application.
   config:
     clusterURL: "https://rancher-url/v3"
     clusters:
