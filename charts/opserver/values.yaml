@@ -1,31 +1,59 @@
-
+# -- Configure custom image specs
 image:
-  ## Image Setttings
-  # registry: "docker.io"
+  # -- Custom registry to use
+  registry: ""
+  # -- Image Repository to use
   repository: "qs-automator"
+  # -- PullPolicy to pull the image
   pullPolicy: Always
+  # -- Image Tag Specification
   tag: "test"
 
-  imagePullSecrets:
-    - registry: docker.io
-      username: myname
-      password: password
+  # -- Image Pull Secrets.
+  # If only Name is registered.
+  # If registry, username, password is set, will be generating a new docker secret
+  # @default -- one or more of `[{"name": "registry"}, {"name": "docker", "registry": "docker.io", "username": "user", "password": "password"}]`
+  imagePullSecrets: []
+    # - registry: docker.io
+    #   username: myname
+    #   password: password
+    #   name: docker-registry
+    # - name: registry
 
 pod:
+  # -- extra pod annotations
   annotations:
     sidecar.istio.io/rewriteAppHTTPProbers: "true"
+    proxy.istio.io/conifg: "{holdApplicationUntilProxyStarts: true}"
+  # -- extra pod labels
   labels: {}
+  # -- pod default resources
+  resources:
+    limits:
+      cpu: 128m
+      memory: 128Mi
+    requests:
+      cpu: 64m
+      memory: 64Mi
 
 ingress:
+  # -- Enable Ingress via VirtualServices
   enabled: true
+  # -- Ingress Configuration
   config: 
+    # -- The Hosts (domains) in the Virtual Service
     hosts:
       - "ingress.com"
-    #gateways: ""
+    # -- Capability to set Custom gateways
+    # @default -- "istio-system/istio-ingress-gateway"
+    gateways: []
+    # -- path based Routing
+    # will strip leading and trailing / and add them where it will be needed
     paths:
       - /opserver
 
 config:
+  # -- Config.yaml Sample for the Application.
   apiToken: "secret-token"
   config:
     clusterURL: "https://rancher-url/v3"
@@ -33,6 +61,8 @@ config:
       - name: "my-cluster"
         ingress: "my-cluster.domain.com"
         environment: ["cluster"]
+  # -- limit.yaml Sample for the Application
+  # set the Limits for the artefacts
   limits:
     istioIngressgateway:
       cpu: 2
@@ -42,15 +72,29 @@ config:
       memory: 3000Mi
 
 service:
+  # --  The services Port
   port: 8080
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Automatically mount a ServiceAccount's API credentials?
-  automount: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- The name of the service account to use.
+  # @default -- If not set, a name is generated using the fullname template
   name: ""
+
+# -- Set the Security Context
+# @default -- `{"runAsUser": 1668442480, "runAsGroup": 1668442480, "fsGroup": 1668442480, "fsGroupChangePolicy": "OnRootMismatch"}`
+securityContext: {}
+  # runAsUser: 1668442480
+  # runAsGroup: 1668442480
+  # fsGroup: 1668442480
+
+# -- Opserver is Capable to supply metrics
+serviceMonitor:
+  # -- enable ServiceMonitor endpoint
+  enabled: false
+  # -- custom Labels to suppliy for label matching prometheus scraping
+  customLabels:
+    label: test
