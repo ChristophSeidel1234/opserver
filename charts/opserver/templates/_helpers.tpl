@@ -68,3 +68,26 @@ Set the Image Pull Secret if needed
 {{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" .registry .username .password .email (printf "%s:%s" .username .password | b64enc) | b64enc }}
 {{- end }}
 
+
+{{/*
+Set the Security Context
+*/}}
+{{- define "securityContext" }}
+runAsUser: {{ default 1668442480 (.Values.securityContext).runAsUser }}
+runAsGroup: {{ default 1668442480 (.Values.securityContext).runAsGroup }}
+fsGroup: {{ default 1668442480 (.Values.securityContext).fsGroup }}
+fsGroupChangePolicy: "OnRootMismatch"
+{{- end }}
+
+{{/*
+Set Pod Security Context
+*/}}
+{{- define "pod.securityContext" }}
+allowPrivilegeEscalation: false
+capabilities:
+    drop:
+    - ALL
+privileged: false
+readOnlyRootFilesystem: true
+runAsNonRoot: true
+{{- end }}
