@@ -7,6 +7,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       {{- include "opserver.selectorLabels" . | nindent 6 }}
@@ -26,10 +27,13 @@ spec:
     spec:
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:
-      {{- range $index, $s := . }}
-        - {{- print "registry-" $index }}
+      {{- range . }}
+        - {{ .name  }}
       {{- end }}
       {{- end }}
+      serviceaccountName: {{ include "opserver.serviceAccountName" . }}
+      securityContext:
+        {{- include "securityContext" . | indent 8 }}
       containers:
         - env:
             - name: API_TOKEN
@@ -38,8 +42,30 @@ spec:
                   name: {{ template "opserver.fullname" . }}-secret
                   key: API_TOKEN
           image: "{{ default "docker.io" .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ default "Always" .Values.image.pullPolicy }}
           name: {{ .Chart.Name }}
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            successThreshold: 1
+            httpGet:
+              path: /v1/summarize
+              port: {{ .Values.service.port }}
+            timeoutSeconds: 2
+          readinessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - ls /usr/src/app
+              failureThreshold: 3
+              initialDelaySeconds: 2
+              periodSeconds: 5
+              successThreshold: 2
+              timeoutSeconds: 5
+          stdin: true
+          tty: true
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -49,10 +75,17 @@ spec:
             - mountPath: /config
               name: {{ include "opserver.fullname" . }}-config
               readOnly: true
+            - mountPath: /tmp
+              name: tmp
+          securityContext:
+            {{- include "pod.securityContext" . | indent 12 }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.pod.resources | nindent 12 }}
       restartPolicy: Always
       volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 20Mi
         - name: {{ include "opserver.fullname" . }}-config
           configMap:
             name: {{ include "opserver.fullname" . }}-config
