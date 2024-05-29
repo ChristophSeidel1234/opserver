@@ -1,15 +1,17 @@
 {{- if .Values.image.imagePullSecrets }}
-{{- range $index, $registry := .Values.image.imagePullSecrets}}
+{{- range .Values.image.imagePullSecrets}}
+{{- if and (hasKey . "registry" ) (hasKey . "username") }}
 apiVersion: v1
 kind: Secret
 metadata:
   labels:
     {{- include "opserver.labels" $ | nindent 4 }}
-  name: {{ print "registry-" $index }}
+  name: {{ .name }}
   namespace: {{ $.Release.Namespace }}
 data:
-  .dockerconfigjson: {{ template "imagePullSecret" $registry }}
+  .dockerconfigjson: {{ template "imagePullSecret" . }}
 type: kubernetes.io/dockerconfigjson
 ---
+{{- end }}
 {{- end }}
 {{- end }}
