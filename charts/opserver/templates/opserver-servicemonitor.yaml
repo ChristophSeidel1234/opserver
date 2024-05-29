@@ -1,0 +1,25 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "opserver.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "opserver.labels" . | nindent 4 }}
+    {{- with .Values.serviceMonitor.customLabels }}
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+    {{- end }}
+spec:
+  endpoints:
+    - path: /metrics
+      port: http-info
+      scheme: HTTPS
+      targetPort: {{ .Values.service.port }}
+      tlsConfig:
+        insecureSkipVerify: true
+  selector:
+    matchLabels:
+      {{- include "opserver.selectorLabels" . | nindent 6 }}
+{{- end }}
