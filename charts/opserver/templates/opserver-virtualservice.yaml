@@ -3,14 +3,18 @@ apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   labels:
-    app: opserver
+    {{- include "opserver.labels" . | nindent 4 }}
   name: opserver
   namespace: {{ .Release.Namespace }}
 spec:
   {{- with .Values.ingress.config }}
   gateways:
+    {{- if .gateways }}
     {{- range .gateways }}
-    - {{ . | default "istio-system/istio-ingress-gateway" }}
+    - {{ . }}
+    {{- end }}
+    {{- else }}
+    - "istio-system/istio-ingress-gateway"
     {{- end }}
   hosts:
     {{- range .hosts }}
