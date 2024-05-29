@@ -24,7 +24,7 @@ pod:
   # -- extra pod annotations
   annotations:
     sidecar.istio.io/rewriteAppHTTPProbers: "true"
-    proxy.istio.io/conifg: "{holdApplicationUntilProxyStarts: true}"
+    proxy.istio.io/config: "{holdApplicationUntilProxyStarts: true}"
   # -- extra pod labels
   labels: {}
   # -- pod default resources
@@ -97,5 +97,4 @@ serviceMonitor:
   # -- enable ServiceMonitor endpoint
   enabled: false
   # -- custom Labels to suppliy for label matching prometheus scraping
-  customLabels:
-    label: test
+  customLabels: {}
