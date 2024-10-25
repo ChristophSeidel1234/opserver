@@ -246,7 +246,7 @@ if __name__=="__main__":
                 print(f"Connection to {config.clusterURL} failed. Host not reachable!")
                 exit()
 
-            print("clusters:", clusters)
+            print("CLUSTERS clusters:", clusters)
             qs = QS(clusters=clusters, config=config, limits=ResourceLimits())
             qs.run()
         if config.debug:
