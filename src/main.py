@@ -222,6 +222,9 @@ if __name__=="__main__":
     config = readYAML(args.path)
     try:
         clusters = K8sCluster(config=config).loadClusters()
+        print("")
+        print(f'clusters = {clusters}')
+        print("")
     except ConnectTimeout:
         print(f"Connection to {config.clusterURL} failed. Host not reachable!")
         exit()
