@@ -19,7 +19,8 @@ class Cluster():
 class ClusterConfigCluster():
     name: str
     ingress: str
-    environment: List[str] = lambda: [""]
+    # environment: List[str] = lambda: [""]
+    environment: List[str] =  [""]
 
 @dataclass
 class ClusterConfig():
