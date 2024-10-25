@@ -1,12 +1,9 @@
 #apiToken: "secret-token"
-clusterURL: "https://rancher-url/v3"
+clusterURL: "https://rancher.prod.gcp-dev.l-bank.intern.ads/k8s/clusters/c-n96l6"
 clusters:
-  - name: "prod" 
-    ingress: "ingress.com"
-    environment: ["prod", "gcp"]
-  - name: "dev"
-    ingress: "dev.ingress.com"
-    environment: ["dev", "internal"]
+  - name: "online" 
+    ingress: "online.prod.gcp-dev.l-bank.intern.ads"
+    # environment: ["prod", "gcp"]
 debug: False
 proxy: True
 verify: False
