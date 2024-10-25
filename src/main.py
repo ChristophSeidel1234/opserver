@@ -220,6 +220,9 @@ def apiServer():
 if __name__=="__main__":
     args = argParser()
     config = readYAML(args.path)
+    print("")
+    print(f'config = {config}')
+    print("")
     try:
         clusters = K8sCluster(config=config).loadClusters()
         print("")
