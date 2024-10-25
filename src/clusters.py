@@ -108,6 +108,9 @@ class K8sCluster():
                                      n_nodes= n_nodes,
                                      environment=self.__get_cluster(name)["environment"],
                                      base = self.__get_cluster(name)["ingress"])
+                        print("------******------")
+                        print(f'environment = {c_.environment}')
+                        print("------******------")
                         qsClusters.append(c_)
                 print('qsClusters:', qsClusters)
                 return qsClusters
