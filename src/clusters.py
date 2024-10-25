@@ -87,6 +87,9 @@ class K8sCluster():
         ------
         Cluster Endpoint Exception...
         '''
+        print("------******------")
+        print(f'environment = {self.__clusters}')
+        print("------******------")
         try:
             response = get(f"{self.__config.clusterURL}/clusters", headers={"Authorization": f"Bearer {self.__config.apiToken}"}, timeout=2, verify=self.__config.verify) #self.__debug
             print("---init---\n self.__url:",self.__config.clusterURL,"\n self.__token:", self.__config.apiToken, "\nself.__qs:",self.__clusters, "\n self.__debug:",self.__config.debug )
@@ -108,9 +111,6 @@ class K8sCluster():
                                      n_nodes= n_nodes,
                                      environment=self.__get_cluster(name)["environment"],
                                      base = self.__get_cluster(name)["ingress"])
-                        print("------******------")
-                        print(f'environment = {c_.environment}')
-                        print("------******------")
                         qsClusters.append(c_)
                 print('qsClusters:', qsClusters)
                 return qsClusters
