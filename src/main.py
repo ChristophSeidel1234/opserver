@@ -93,8 +93,10 @@ def argParser() -> Namespace:
     #parser.add_argument("--cluster", "-c", dest="cluster", type=str, default=None, help='Rancher Cluster URL')
     #parser.add_argument("--debug", dest="debug", action="store_true", help="set to debugging mode")
     #parser.add_argument("--proxy", dest="proxy", action="store_false", default=True, help="Use Rancher Proxy and scrape that endpoint for testing")
-    parser.add_argument("--path", type=str, dest="path", default="/config/config.yaml", help="Path for Config yaml")
-    return parser.parse_args()
+    parser.add_argument("--path", type=str, dest="path", default="config/config.yaml", help="Path for Config yaml")
+    args = parser.parse_args()
+    print(f'args.path = {args.path}')
+    return args
 
 def readYAML(path: str):
     if os.path.exists(path):

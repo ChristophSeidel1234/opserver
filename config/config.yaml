@@ -1,4 +1,4 @@
-#apiToken: "secret-token"
+apiToken: "kubeconfig-u-pl99lfxvj8:wm2z4zbtlj7bx6gs89g6rx6psks5nqf5lx24c4vc7ngdbzd7hmzn6h"
 clusterURL: "https://rancher.prod.gcp-dev.l-bank.intern.ads/k8s/clusters/c-n96l6"
 clusters:
   - name: "online" 
