@@ -3,7 +3,7 @@ clusterURL: "https://rancher.prod.gcp-dev.l-bank.intern.ads/k8s/clusters/c-n96l6
 clusters:
   - name: "online" 
     ingress: "online.prod.gcp-dev.l-bank.intern.ads"
-    environment: ["prod"]
+    environment: ["prod", "gcp"]
 debug: False
 proxy: True
 verify: False
