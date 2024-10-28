@@ -3,11 +3,11 @@ image:
   # -- Custom registry to use
   registry: ""
   # -- Image Repository to use
-  repository: "qs-automator"
+  repository: "christoph507/opserver"
   # -- PullPolicy to pull the image
   pullPolicy: Always
   # -- Image Tag Specification
-  tag: "test"
+  tag: "0.1.0"
 
   # -- Image Pull Secrets.
   # If only Name is registered.
