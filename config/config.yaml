@@ -1,5 +1,5 @@
 apiToken: "kubeconfig-u-pl99lfxvj8:wm2z4zbtlj7bx6gs89g6rx6psks5nqf5lx24c4vc7ngdbzd7hmzn6h"
-clusterURL: "https://rancher.prod.gcp-dev.l-bank.intern.ads/k8s/clusters/c-n96l6"
+clusterURL: "https://rancher.prod.gcp-dev.l-bank.intern.ads/v3"
 clusters:
   - name: "online" 
     ingress: "online.prod.gcp-dev.l-bank.intern.ads"
